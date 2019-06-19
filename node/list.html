@@ -30,7 +30,6 @@
 </tr>
 </thead>
 <tbody>
-
 <% data.forEach(function (item,index){ %>
 <tr>
 <td>
@@ -40,7 +39,7 @@
 <a href='/detail/<%= item.id %>'><%= item.title %></a>
 </td>
 <td>
-<%= item.contents %>
+<%= item.content %>
 </td>
 <td>
 <a href="/edit/<%= item.id %>">수정</a>
@@ -123,7 +122,7 @@ if(i == curPage){
 <%
 if(curSet < totalSet){
 %>
-<li value=( endPage + 1) class="next">
+<li value='<%= ( endPage + 1) %>' class="next">
 <a href='/list/<%= ( endPage + 1) %>'>다음페이지</a>
 </li>
 <%

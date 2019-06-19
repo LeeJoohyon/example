@@ -7,3 +7,7 @@ function callbackTest(a, b, callback)
 callbackTest(1, 2, function(msg){
     console.log(msg);
 });
+
+
+var test = 1; 
+var fun_callback = callbackTest(1,2);

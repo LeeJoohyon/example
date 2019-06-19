@@ -32,9 +32,7 @@ router.get("/list/:cur", function(req, res) {
  
      //현제 페이지
      var curPage = req.params.cur;
- 
-     console.log("현재 페이지 : " + curPage, "전체 게시물 : " + totalPageCount);
- 
+  
      //전체 페이지 갯수
      if (totalPageCount < 0) {
        totalPageCount = 0;
@@ -45,7 +43,7 @@ router.get("/list/:cur", function(req, res) {
      var curSet = Math.ceil(curPage / page_list_size); // 현재 셋트 번호
      var startPage = (curSet - 1) * 10 + 1; //현재 세트내 출력될 시작 페이지
      var endPage = startPage + page_list_size - 1; //현재 세트내 출력될 마지막 페이지
- 
+
      //현재페이지가 0 보다 작으면
      if (curPage < 0) {
        no = 0;
@@ -54,29 +52,11 @@ router.get("/list/:cur", function(req, res) {
        no = (curPage - 1) * 10;
      }
  
-     console.log(
-       "[0] curPage : " +
-         curPage +
-         " | [1] page_list_size : " +
-         page_list_size +
-         " | [2] page_size : " +
-         page_size +
-         " | [3] totalPage : " +
-         totalPage +
-         " | [4] totalSet : " +
-         totalSet +
-         " | [5] curSet : " +
-         curSet +
-         " | [6] startPage : " +
-         startPage +
-         " | [7] endPage : " +
-         endPage
-     );
  
      var result2 = {
-       curPage: curPage,
-       page_list_size: page_list_size,
-       page_size: page_size,
+       curPage: curPage, // 현재페이지
+       page_list_size: page_list_size, // 현재 페이지 셋
+       page_size: page_size, // 페이지 사이즈
        totalPage: totalPage,
        totalSet: totalSet,
        curSet: curSet,
@@ -89,8 +69,6 @@ router.get("/list/:cur", function(req, res) {
          console.log("ejs오류" + error);
          return;
        }
-
-       console.log(data);
  
        var queryString = "select * from post where status=0 order by id desc limit ?, ?";
        getConnection().query(queryString, [no, page_size], function(
@@ -101,7 +79,8 @@ router.get("/list/:cur", function(req, res) {
            console.log(error);
            return;
          }
-
+         
+         console.log(result);
          //RESPONSE 
          res.send(
            ejs.render(data, {
@@ -120,22 +99,40 @@ router.get("/", function(req,res){
    res.redirect('/list/1');
 });
 
+// 글쓰기 페이지를 로드 하는 요청을 처리
 router.get("/insert", function(req, res){
    fs.readFile("insert.html", "utf-8", function(err, data){
       res.send(ejs.render(data));
    });
 });
 
+
+// 글쓰기폼에서 요청된 데이터를 DB에 입력하는 요청을 처리
 router.post('/insert', function(req, res){
-   console.log(req.body);
    var title = req.body.title;
    var content = req.body.contents;
+
    var queryString = 'insert into post (title, content) values (?, ?)';
    getConnection().query(queryString, [title, content], function(err, data){
       if (err){
          console.log("insert error : " + err);
       }
       res.redirect('/list/'+1);
+   });
+});
+
+
+router.get('/edit/:id', function(req, res){
+   var id = req.params.id;
+
+   var queryString = "select * from post where id=? and status=0";
+   getConnection().query(queryString, function(err, data){
+      console.log(data);
+      fs.readFile('edit.html', 'utf-8', function(err, data){
+         if (err){
+            console.log('파일 에러');
+         }
+      });
    });
 });
 
