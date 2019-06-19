@@ -9,12 +9,104 @@ router.use(bodyParser.urlencoded({ extended: false }));
 //게시판 페이징
 
 router.get("/list/:cur", function(req, res) {
-
-   fs.readFile('list.html', 'utf-8', function (error, data) {
-      res.send(ejs.render(data));
+   //페이지당 게시물 수 : 한 페이지 당 10개 게시물
+   var page_size = 10;
+   //페이지의 갯수 : 1 ~ 10개 페이지
+   var page_list_size = 10;
+   //limit 변수
+   var no = "";
+   //전체 게시물의 숫자
+   var totalPageCount = 0;
+ 
+   var queryString = "select count(*) as cnt from post";
+   getConnection().query(queryString, function(error2, data) {
+     if (error2) {
+       console.log(error2 + "메인 화면 mysql 조회 실패");
+       return;
+     }
+     //전체 게시물의 숫자
+     totalPageCount = data[0].cnt;
+ 
+     //현제 페이지
+     var curPage = req.params.cur;
+ 
+     console.log("현재 페이지 : " + curPage, "전체 게시물 : " + totalPageCount);
+ 
+     //전체 페이지 갯수
+     if (totalPageCount < 0) {
+       totalPageCount = 0;
+     }
+ 
+     var totalPage = Math.ceil(totalPageCount / page_size); // 전체 페이지수
+     var totalSet = Math.ceil(totalPage / page_list_size); //전체 세트수
+     var curSet = Math.ceil(curPage / page_list_size); // 현재 셋트 번호
+     var startPage = (curSet - 1) * 10 + 1; //현재 세트내 출력될 시작 페이지
+     var endPage = startPage + page_list_size - 1; //현재 세트내 출력될 마지막 페이지
+ 
+     //현재페이지가 0 보다 작으면
+     if (curPage < 0) {
+       no = 0;
+     } else {
+       //0보다 크면 limit 함수에 들어갈 첫번째 인자 값 구하기
+       no = (curPage - 1) * 10;
+     }
+ 
+     console.log(
+       "[0] curPage : " +
+         curPage +
+         " | [1] page_list_size : " +
+         page_list_size +
+         " | [2] page_size : " +
+         page_size +
+         " | [3] totalPage : " +
+         totalPage +
+         " | [4] totalSet : " +
+         totalSet +
+         " | [5] curSet : " +
+         curSet +
+         " | [6] startPage : " +
+         startPage +
+         " | [7] endPage : " +
+         endPage
+     );
+ 
+     var result2 = {
+       curPage: curPage,
+       page_list_size: page_list_size,
+       page_size: page_size,
+       totalPage: totalPage,
+       totalSet: totalSet,
+       curSet: curSet,
+       startPage: startPage,
+       endPage: endPage
+     };
+ 
+     fs.readFile("list.html", "utf-8", function(error, data) {
+       if (error) {
+         console.log("ejs오류" + error);
+         return;
+       }
+ 
+       var queryString = "select * from post order by id desc limit ?, ?";
+       getConnection().query(queryString, [no, page_size], function(
+         error,
+         result
+       ) {
+         if (error) {
+           console.log(error);
+           return;
+         }
+         res.send(
+           ejs.render(data, {
+             data: result,
+             list: result2
+           })
+         );
+       });
+     });
    });
-      
-});
+ });
+ 
 
 router.get("/", function(req,res){
    console.log("메인화면");
