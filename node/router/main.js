@@ -4,6 +4,9 @@ var mysql = require("mysql");
 var fs = require("fs");
 var ejs = require("ejs");
 var bodyParser = require("body-parser");
+var app = express();
+
+// app.set("views"+__dirname+"/views");
 
 router.use(bodyParser.urlencoded({ extended: false }));
 //게시판 페이징
@@ -18,7 +21,7 @@ router.get("/list/:cur", function(req, res) {
    //전체 게시물의 숫자
    var totalPageCount = 0;
  
-   var queryString = "select count(*) as cnt from post";
+   var queryString = "select count(*) as cnt from post where status=0";
    getConnection().query(queryString, function(error2, data) {
      if (error2) {
        console.log(error2 + "메인 화면 mysql 조회 실패");
@@ -89,7 +92,7 @@ router.get("/list/:cur", function(req, res) {
 
        console.log(data);
  
-       var queryString = "select * from post order by id desc limit ?, ?";
+       var queryString = "select * from post where status=0 order by id desc limit ?, ?";
        getConnection().query(queryString, [no, page_size], function(
          error,
          result
@@ -122,6 +125,21 @@ router.get("/insert", function(req, res){
       res.send(ejs.render(data));
    });
 });
+
+router.post('/insert', function(req, res){
+   console.log(req.body);
+   var title = req.body.title;
+   var content = req.body.contents;
+   var queryString = 'insert into post (title, content) values (?, ?)';
+   getConnection().query(queryString, [title, content], function(err, data){
+      if (err){
+         console.log("insert error : " + err);
+      }
+      res.redirect('/list/'+1);
+   });
+});
+
+
 
 // MYSQL 연결
 var connection = mysql.createPool({
