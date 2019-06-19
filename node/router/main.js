@@ -86,6 +86,8 @@ router.get("/list/:cur", function(req, res) {
          console.log("ejs오류" + error);
          return;
        }
+
+       console.log(data);
  
        var queryString = "select * from post order by id desc limit ?, ?";
        getConnection().query(queryString, [no, page_size], function(
@@ -96,6 +98,8 @@ router.get("/list/:cur", function(req, res) {
            console.log(error);
            return;
          }
+
+         //RESPONSE 
          res.send(
            ejs.render(data, {
              data: result,
@@ -111,6 +115,12 @@ router.get("/list/:cur", function(req, res) {
 router.get("/", function(req,res){
    console.log("메인화면");
    res.redirect('/list/1');
+});
+
+router.get("/insert", function(req, res){
+   fs.readFile("insert.html", "utf-8", function(err, data){
+      res.send(ejs.render(data));
+   });
 });
 
 // MYSQL 연결
