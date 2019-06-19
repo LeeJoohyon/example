@@ -37,7 +37,7 @@ router.get("/list/:cur", function(req, res) {
        totalPageCount = 0;
      }
  
-     var totalPage = Math.ceil(totalPageCount / page_size); // 전체 페이지수
+     var totalPage = Math.ceil(totalPageCount / page_size); // 전체 페이지수 1500/10
      var totalSet = Math.ceil(totalPage / page_list_size); //전체 세트수
      var curSet = Math.ceil(curPage / page_list_size); // 현재 셋트 번호
      var startPage = (curSet - 1) * 10 + 1; //현재 세트내 출력될 시작 페이지
@@ -106,7 +106,7 @@ router.get("/list/:cur", function(req, res) {
      });
    });
  });
- 
+
 
 router.get("/", function(req,res){
    console.log("메인화면");
