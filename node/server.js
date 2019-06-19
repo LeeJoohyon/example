@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //게시판
 var mainRouter = require("./router/main");
 
+
 app.use(mainRouter);
 //var PORT = process.env.PORT || 3000
 //서버 가동
