@@ -145,9 +145,52 @@ router.get('/edit/:id', function(req, res){
 });
 
 
-router.post("/edit/:id", function(res, req){
-    var queryString = ""
+router.post("/edit/:id", function(req, res){
+    var id = req.params.id;
+    var queryString = "update post set title=?, content=? where id=?";
+    var body = req.body;
+    console.log(body);
+    getConnection().query(queryString, [body.title, body.content, id], function(err, data){
+      if (err){
+        console.log(err);
+      }
+      res.redirect('/list/1');
+    });
 });
+
+router.get("/delete/:id", function(req, res){
+  var id = req.params.id;
+  var queryString = "update post set status=1 where id=?";
+  getConnection().query(queryString, [id], function(err,data){
+    if (err){
+      console.log(err);
+    }
+    res.redirect("/list/1");
+  });
+});
+
+router.get("/detail/:id", function(req, res){
+  var id = req.params.id;
+  var queryString = "select * from post where id=?"
+
+  getConnection().query(queryString, [id], function(err, data){
+    if (err){
+      console.log(err);
+    }
+
+    var result = data[0];
+
+    fs.readFile("detail.html", 'utf-8', function(err, data){
+        if (err){
+          console.log(err);
+        }
+
+        res.send(ejs.render(data, {
+          data : result
+        }));
+    });
+  });
+})
 
 
 

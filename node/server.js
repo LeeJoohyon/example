@@ -14,6 +14,6 @@ var mainRouter = require("./router/main");
 app.use(mainRouter);
 //var PORT = process.env.PORT || 3000
 //서버 가동
-app.listen(3000, function() {
+app.listen(3001, function() {
   console.log("서버가동");
 });
