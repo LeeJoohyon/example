@@ -125,15 +125,28 @@ router.post('/insert', function(req, res){
 router.get('/edit/:id', function(req, res){
    var id = req.params.id;
 
-   var queryString = "select * from post where id=? and status=0";
-   getConnection().query(queryString, function(err, data){
-      console.log(data);
+   var queryString = "select * from post where id=?";
+   getConnection().query(queryString, [id], function(err, data){
+
+     if (err){
+       console.log(err);
+     }
+      var result = data[0];
       fs.readFile('edit.html', 'utf-8', function(err, data){
          if (err){
             console.log('파일 에러');
          }
+         res.send(ejs.render(data, {
+            data : result,
+         })
+         );
       });
    });
+});
+
+
+router.post("/edit/:id", function(res, req){
+    var queryString = ""
 });
 
 
